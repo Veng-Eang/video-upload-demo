@@ -1,0 +1,45 @@
+# Add under your existing application.yml (merge with existing `lms:` key if present).
+
+lms:
+  video:
+    upload-dir: /home/vengeang/Desktop/data/lms/uploads          # raw source files land here, one subfolder per lessonId
+    hls-output-dir: /home/vengeang/Desktop/data/lms/hls          # ffmpeg renditions + master.m3u8 land here
+    ffmpeg-binary: /usr/bin/ffmpeg
+    public-hls-base-path: http://localhost:8091/api/lessons       # must match wherever hls-output-dir is exposed publicly
+
+# WebFlux multipart file parts stream straight to disk via FilePart#transferTo,
+# so max-in-memory-size mainly matters for non-file form fields — but raise it
+# a little from the default (256KB) to be safe with larger multipart headers.
+server:
+  port: 8091
+spring:
+  application:
+    name: backend-demo
+  codec:
+    max-in-memory-size: 2MB
+  webflux:
+    multipart:
+      max-in-memory-size: 2MB
+      # max-disk-usage-per-part is unlimited by default; cap it if you want a hard ceiling
+      # independent of your dropzone's 8GB client-side check:
+      # max-disk-usage-per-part: 8GB
+  data:
+    mongodb:
+      username: vengeang
+      password: password
+      host: localhost
+      port: 27017
+      database: backend-demo
+      authentication-database: admin
+
+---
+# nginx (matches your existing reverse-proxy setup): serve hls-output-dir as
+# static files at the public-hls-base-path above, e.g.
+#
+#   location /media/hls/ {
+#       alias /data/lms/hls/;
+#       add_header Access-Control-Allow-Origin *;
+#   }
+#
+# Keep this as a separate nginx `location` block (not proxied to Spring) so
+# segment (.ts) delivery doesn't tie up WebFlux threads.
