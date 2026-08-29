@@ -2,9 +2,9 @@
 
 lms:
   video:
-    upload-dir: /home/vengeang/Desktop/data/lms/uploads          # raw source files land here, one subfolder per lessonId
-    hls-output-dir: /home/vengeang/Desktop/data/lms/hls          # ffmpeg renditions + master.m3u8 land here
-    ffmpeg-binary: /usr/bin/ffmpeg
+    upload-dir: C:/Users/oengv/OneDrive/Documents/data/demo-lms/uploads          # raw source files land here, one subfolder per lessonId
+    hls-output-dir: C:/Users/oengv/OneDrive/Documents/data/demo-lms/hls          # ffmpeg renditions + master.m3u8 land here
+    ffmpeg-binary: ffmpeg
     public-hls-base-path: http://localhost:8091/api/lessons       # must match wherever hls-output-dir is exposed publicly
 
 # WebFlux multipart file parts stream straight to disk via FilePart#transferTo,
@@ -31,7 +31,14 @@ spring:
       port: 27017
       database: backend-demo
       authentication-database: admin
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
 ---
 # nginx (matches your existing reverse-proxy setup): serve hls-output-dir as
 # static files at the public-hls-base-path above, e.g.
