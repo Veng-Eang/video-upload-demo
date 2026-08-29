@@ -35,10 +35,15 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,metrics,prometheus
+        include: health,metrics
   endpoint:
     health:
       show-details: always
+  otlp:
+    metrics:
+      export:
+        url: "http://localhost:4318/v1/metrics"
+        step: 10s
 ---
 # nginx (matches your existing reverse-proxy setup): serve hls-output-dir as
 # static files at the public-hls-base-path above, e.g.
